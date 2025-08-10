@@ -27,6 +27,12 @@ def safe_callback_answer(callback):
     except Exception:
         pass
 
+def escape_username_for_markdown(username: str) -> str:
+    """Экранирует символы подчеркивания в юзернейме для Markdown"""
+    if not username:
+        return "unknown"
+    return username.replace("_", "\\_")
+
 def register_user_handlers(dp, config: Config):
     """Регистрация пользовательских хендлеров"""
     
@@ -294,7 +300,7 @@ Phoenix PS - профессиональная команда специалис�
                 
                 order_message = MESSAGES["manager_notification"].format(
                     service_name=service['name'],
-                    username=user.username or "unknown",
+                    username=escape_username_for_markdown(user.username),
                     time=datetime.now().strftime("%d.%m.%Y %H:%M"),
                     price=service['price'],
                     description=service['description']
@@ -310,7 +316,7 @@ Phoenix PS - профессиональная команда специалис�
                         
                         # Если не удалось отправить в канал, уведомляем админа
                         if config.ADMIN_ID:
-                            error_msg = f"⚠️ Не удалось опубликовать заявку от @{user.username or 'unknown'} в канал. Проверьте настройки канала."
+                            error_msg = f"⚠️ Не удалось опубликовать заявку от @{escape_username_for_markdown(user.username)} в канал. Проверьте настройки канала."
                             try:
                                 await bot.send_message(config.ADMIN_ID, error_msg)
                             except Exception as admin_error:
@@ -318,7 +324,7 @@ Phoenix PS - профессиональная команда специалис�
                 else:
                     # Если канал не настроен, уведомляем админа
                     if config.ADMIN_ID:
-                        error_msg = f"⚠️ Канал для заявок не настроен! Заявка от @{user.username or 'unknown'} не была опубликована."
+                        error_msg = f"⚠️ Канал для заявок не настроен! Заявка от @{escape_username_for_markdown(user.username)} не была опубликована."
                         try:
                             await bot.send_message(config.ADMIN_ID, error_msg)
                         except Exception as admin_error:
