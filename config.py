@@ -69,7 +69,6 @@ CATEGORIES = {
     "optimization": "📦 Услуги по оптимизации и разгону ПК",
     "components": "💻 Комплектующие", 
     "devices": "🖱 Девайсы",
-    "school": "🎓 Школа",
     "about": "🧾 О нас",
     "contacts": "📞 Контакты и заказ"
 }

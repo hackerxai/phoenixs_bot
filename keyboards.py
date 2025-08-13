@@ -14,10 +14,7 @@ def get_main_menu_keyboard():
         InlineKeyboardButton(text="🖱 Девайсы", callback_data="category_devices"),
         width=2
     )
-    keyboard.row(
-        InlineKeyboardButton(text="🎓 Школа", callback_data="category_school"),
-        width=1
-    )
+
     keyboard.row(
         InlineKeyboardButton(text="🧾 О нас", callback_data="category_about"),
         InlineKeyboardButton(text="📞 Контакты", callback_data="category_contacts"),
