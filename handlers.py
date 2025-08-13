@@ -112,7 +112,7 @@ def register_user_handlers(dp, config: Config):
         if category_key == "about":
             about_text = """🧾 **О нас**
 
-Phoenix PS - профессиональная команда специалистов по оптимизации Windows и разгону компьютеров.
+Phoenix Group - профессиональная команда специалистов по оптимизации Windows и разгону компьютеров.
 
 🔥 **Наши преимущества:**
 • Многолетний опыт работы
@@ -135,6 +135,18 @@ Phoenix PS - профессиональная команда специалис�
             await safe_callback_answer(callback)
             return
         
+        elif category_key == "giveaway":
+            giveaway_text = config.GIVEAWAY_DESCRIPTION
+
+            if callback.message and hasattr(callback.message, 'edit_text'):
+                await callback.message.edit_text(
+                    giveaway_text,
+                    reply_markup=get_back_to_main_keyboard(),
+                    parse_mode="Markdown"
+                )
+            await safe_callback_answer(callback)
+            return
+
         elif category_key == "contacts":
             contacts_text = """📞 **Контакты и заказ**
 

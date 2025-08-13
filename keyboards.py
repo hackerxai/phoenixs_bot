@@ -14,6 +14,10 @@ def get_main_menu_keyboard():
         InlineKeyboardButton(text="🖱 Девайсы", callback_data="category_devices"),
         width=2
     )
+    keyboard.row(
+        InlineKeyboardButton(text="🎁 Розыгрыш", callback_data="category_giveaway"),
+        width=1
+    )
 
     keyboard.row(
         InlineKeyboardButton(text="🧾 О нас", callback_data="category_about"),

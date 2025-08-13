@@ -33,21 +33,32 @@ class Config:
                     settings = json.load(f)
                     self.MANAGER_USERNAME = settings.get("manager_username", "")
                     self.CHANNEL_ID = settings.get("channel_id", "")
+                    self.GIVEAWAY_DESCRIPTION = settings.get(
+                        "giveaway_description",
+                        """🎁 **Розыгрыш**\n\nЗдесь публикуем актуальные розыгрыши и условия участия.\n\n- Подпишитесь на наш канал\n- Нажмите участвовать\n- Ждите итоги в канале\n\nУдачи!"""
+                    )
             else:
                 self.MANAGER_USERNAME = "phoen1xPC"
                 self.CHANNEL_ID = "@helprepairpc"
+                self.GIVEAWAY_DESCRIPTION = (
+                    """🎁 **Розыгрыш**\n\nЗдесь публикуем актуальные розыгрыши и условия участия.\n\n- Подпишитесь на наш канал\n- Нажмите участвовать\n- Ждите итоги в канале\n\nУдачи!"""
+                )
                 self.save_settings()
         except Exception as e:
             print(f"Ошибка загрузки настроек: {e}")
             self.MANAGER_USERNAME = "phoen1xPC"
             self.CHANNEL_ID = "@helprepairpc"
+            self.GIVEAWAY_DESCRIPTION = (
+                """🎁 **Розыгрыш**\n\nЗдесь публикуем актуальные розыгрыши и условия участия.\n\n- Подпишитесь на наш канал\n- Нажмите участвовать\n- Ждите итоги в канале\n\nУдачи!"""
+            )
     
     def save_settings(self):
         """Сохранение настроек в файл"""
         try:
             settings = {
                 "manager_username": self.MANAGER_USERNAME,
-                "channel_id": self.CHANNEL_ID
+                "channel_id": self.CHANNEL_ID,
+                "giveaway_description": self.GIVEAWAY_DESCRIPTION
             }
             with open(self.settings_file, 'w', encoding='utf-8') as f:
                 json.dump(settings, f, ensure_ascii=False, indent=2)
@@ -64,11 +75,17 @@ class Config:
         self.CHANNEL_ID = channel_id
         self.save_settings()
 
+    def set_giveaway_description(self, description: str):
+        """Установка описания раздела Розыгрыш"""
+        self.GIVEAWAY_DESCRIPTION = description
+        self.save_settings()
+
 # Категории услуг
 CATEGORIES = {
     "optimization": "📦 Услуги по оптимизации и разгону ПК",
     "components": "💻 Комплектующие", 
     "devices": "🖱 Девайсы",
+    "giveaway": "🎁 Розыгрыш",
     "about": "🧾 О нас",
     "contacts": "📞 Контакты и заказ"
 }

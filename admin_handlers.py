@@ -109,7 +109,7 @@ def register_admin_handlers(dp, config: Config):
         
         # Добавляем кнопки для каждой категории
         for key, name in CATEGORIES.items():
-            if key not in ['about', 'contacts']:  # Исключаем служебные категории
+            if key not in ['about', 'contacts', 'giveaway']:  # Исключаем служебные категории
                 keyboard.row(InlineKeyboardButton(text=name, callback_data=f"add_cat_{key}"))
         
         keyboard.row(InlineKeyboardButton(text="🔙 Отмена", callback_data="admin_menu"))
@@ -265,11 +265,13 @@ def register_admin_handlers(dp, config: Config):
         
         keyboard = InlineKeyboardBuilder()
         keyboard.row(InlineKeyboardButton(text="📢 Изменить канал для заявок", callback_data="admin_set_channel"))
+        keyboard.row(InlineKeyboardButton(text="🎁 Текст кнопки Розыгрыш", callback_data="admin_set_giveaway"))
         keyboard.row(InlineKeyboardButton(text="🔙 Назад", callback_data="admin_menu"))
         
         settings_text = f"""⚙️ **Настройки бота**
 
 📢 **Канал для заявок:** {config.CHANNEL_ID or "не установлен"}
+🎁 **Текст Розыгрыша:**\n{config.GIVEAWAY_DESCRIPTION[:200]}{'...' if len(config.GIVEAWAY_DESCRIPTION) > 200 else ''}
 
 Выберите настройку для изменения:"""
         
@@ -311,6 +313,24 @@ def register_admin_handlers(dp, config: Config):
         await callback.message.answer(
             "📢 **Установка канала для заявок**\n\n"
             "Введите ID канала, куда будут публиковаться заявки (например: @helprepairpc или -1001234567890):",
+            parse_mode="Markdown"
+        )
+        await safe_callback_answer(callback)
+
+    @dp.callback_query(F.data == "admin_set_giveaway")
+    async def set_giveaway_ui(callback: CallbackQuery):
+        """Установка описания розыгрыша через UI"""
+        user = callback.from_user
+        if not user or not is_admin(user.id):
+            await safe_callback_answer(callback)
+            return
+        
+        admin_states[user.id] = "waiting_giveaway"
+        
+        await callback.message.answer(
+            "🎁 **Редактирование текста Розыгрыша**\n\n"
+            "Отправьте новый текст, он будет показан пользователям при нажатии кнопки 'Розыгрыш'.\n\n"
+            "Текущий текст:\n\n" + (config.GIVEAWAY_DESCRIPTION or "—"),
             parse_mode="Markdown"
         )
         await safe_callback_answer(callback)
@@ -521,6 +541,26 @@ def register_admin_handlers(dp, config: Config):
             
             await message.answer(
                 f"✅ Канал для заявок установлен: {channel_id}",
+                reply_markup=keyboard.as_markup()
+            )
+            admin_states.pop(user.id, None)
+
+        elif user_state == "waiting_giveaway":
+            # Обновление описания для раздела Розыгрыш
+            if not message.text:
+                await message.answer("❌ Отправьте текст для раздела Розыгрыш.")
+                return
+            
+            config.set_giveaway_description(message.text.strip())
+            
+            from aiogram.utils.keyboard import InlineKeyboardBuilder
+            from aiogram.types import InlineKeyboardButton
+            
+            keyboard = InlineKeyboardBuilder()
+            keyboard.row(InlineKeyboardButton(text="🔙 В настройки", callback_data="admin_settings"))
+            
+            await message.answer(
+                "✅ Текст раздела 'Розыгрыш' обновлен!",
                 reply_markup=keyboard.as_markup()
             )
             admin_states.pop(user.id, None)
